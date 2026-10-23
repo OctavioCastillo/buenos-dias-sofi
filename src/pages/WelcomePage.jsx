@@ -26,7 +26,7 @@ export default function WelcomePage({ onContinue }) {
         </p>
 
         <h1 className="text-3xl font-bold leading-tight tracking-tight">
-          Buenos díasss, Sofi
+          Buenos días Sofi
         </h1>
       </div>
 
