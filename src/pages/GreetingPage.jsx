@@ -1,41 +1,35 @@
-
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "motion/react";
 import { Sun } from "lucide-react";
 import monito from "../assets/images/monito.png";
 
-const sleepPositions = [
-  { x: -65, y: 0 },
-  { x: 65, y: 0 },
-  { x: -35, y: -5 },
-  { x: 35, y: 5 },
-  { x: 0, y: -8 },
-  { x: 0, y: 8 },
-];
-
 export default function GreetingPage({ onContinue }) {
   const [tiredVisible, setTiredVisible] = useState(true);
   const [showTiredImage, setShowTiredImage] = useState(false);
-  const [sleepPosition, setSleepPosition] = useState({
-    x: 0,
-    y: 0,
-  });
+  const [sleepPosition, setSleepPosition] = useState(null);
 
-  function moveSleepButton() {
-    setSleepPosition((previous) => {
-      const currentIndex = sleepPositions.findIndex(
-        (position) =>
-          position.x === previous.x && position.y === previous.y
-      );
+  function moveSleepButton(event) {
+    const button = event.currentTarget;
+    const margin = 12;
 
-      let nextIndex;
+    const buttonWidth = button.offsetWidth;
+    const buttonHeight = button.offsetHeight;
 
-      do {
-        nextIndex = Math.floor(Math.random() * sleepPositions.length);
-      } while (nextIndex === currentIndex);
+    const maxX = Math.max(
+      margin,
+      window.innerWidth - buttonWidth - margin
+    );
 
-      return sleepPositions[nextIndex];
-    });
+    const maxY = Math.max(
+      margin,
+      window.innerHeight - buttonHeight - margin
+    );
+
+    const newX = margin + Math.random() * (maxX - margin);
+    const newY = margin + Math.random() * (maxY - margin);
+
+    setSleepPosition({ x: newX, y: newY });
   }
 
   function handleTiredClick() {
@@ -102,24 +96,44 @@ export default function GreetingPage({ onContinue }) {
                 alt="Monito"
                 className="h-32 w-32 rounded-2xl object-contain"
               />
-
             </motion.div>
           )}
         </AnimatePresence>
 
-        <div className="relative flex min-h-14 w-full items-center justify-center">
-          <motion.button
-            animate={sleepPosition}
-            transition={{
-              type: "spring",
-              stiffness: 350,
-              damping: 18,
-            }}
-            onClick={moveSleepButton}
-            className="rounded-full border border-[#D9E4C7] bg-[#EAF0DF] px-5 py-3 font-medium text-[#4E6240] active:scale-95"
-          >
-            Con ganas de cheetos con frijol
-          </motion.button>
+        {/* Mantiene reservado el espacio original del botón */}
+        <div className="flex min-h-14 w-full items-center justify-center">
+          {!sleepPosition && (
+            <button
+              type="button"
+              onClick={(event) => {
+                const button = event.currentTarget;
+                const margin = 12;
+
+                const buttonWidth = button.offsetWidth;
+                const buttonHeight = button.offsetHeight;
+
+                const maxX = Math.max(
+                  margin,
+                  window.innerWidth - buttonWidth - margin
+                );
+
+                const maxY = Math.max(
+                  margin,
+                  window.innerHeight - buttonHeight - margin
+                );
+
+                const newX =
+                  margin + Math.random() * (maxX - margin);
+                const newY =
+                  margin + Math.random() * (maxY - margin);
+
+                setSleepPosition({ x: newX, y: newY });
+              }}
+              className="rounded-full border border-[#D9E4C7] bg-[#EAF0DF] px-5 py-3 font-medium text-[#4E6240] active:scale-95"
+            >
+              Con ganas de cheetos con frijol
+            </button>
+          )}
         </div>
 
         <button
@@ -129,6 +143,41 @@ export default function GreetingPage({ onContinue }) {
           Bonita ☀️
         </button>
       </div>
+
+      {/* El botón se monta fuera de la tarjeta para moverse libremente */}
+      {sleepPosition &&
+        createPortal(
+          <motion.button
+            type="button"
+            initial={{
+              left: "50%",
+              top: "50%",
+              x: "-50%",
+              y: "-50%",
+            }}
+            animate={{
+              left: sleepPosition.x,
+              top: sleepPosition.y,
+              x: 0,
+              y: 0,
+            }}
+            transition={{
+              type: "spring",
+              stiffness: 350,
+              damping: 24,
+            }}
+            onClick={moveSleepButton}
+            style={{
+              position: "fixed",
+              zIndex: 9999,
+              touchAction: "manipulation",
+            }}
+            className="rounded-full border border-[#D9E4C7] bg-[#EAF0DF] px-5 py-3 font-medium text-[#4E6240] active:scale-95"
+          >
+            Con ganas de cheetos con frijol
+          </motion.button>,
+          document.body
+        )}
     </motion.section>
   );
 }
