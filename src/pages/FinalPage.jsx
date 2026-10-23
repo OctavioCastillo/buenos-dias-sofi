@@ -21,11 +21,11 @@ export default function FinalPage({ onContinue }) {
 
       <div className="space-y-2">
         <h1 className="text-3xl font-bold leading-tight">
-          Como siempre ☀️
+          Como siempre
         </h1>
 
         <p className="text-sm leading-6 text-[#897C65]">
-          Espero que tengas un día bonito. 💛
+          Espero que tengas un día bonito.
         </p>
       </div>
 
